@@ -51,12 +51,44 @@ app.post("/login", (request, response) => {
 
 // GET /signup - Render signup form
 app.get("/signup", (request, response) => {
-    response.render("signup");
-});
+    const errorMessage = request.query.error || null;
+    return response.render("signup", { errorMessage });});
 
 // POST /signup - Allows a user to signup
 app.post("/signup", (request, response) => {
-    
+    const { username, email, password } = request.body;
+    if (!username || !email || !password) {
+          return response
+            .status(400)
+            .render("signup", { errorMessage: "All fields are required" });
+    }
+
+    if (USERS.find((user) => user.username === username)) {
+      return response
+        .status(400)
+        .render("signup", { errorMessage: "Username is already taken" });
+    }
+
+    if (USERS.find((user) => user.email === email)) {
+      return response
+        .status(400)
+        .render("signup", { errorMessage: "Email is already registered" });
+    }
+
+
+    const id = USERS.length + 1;
+    const role = "user";
+    const hashedPassword = bcrypt.hashSync(password, SALT_ROUNDS);
+
+    USERS.push({
+      id,
+      username,
+      email,
+      password: hashedPassword,
+      role,
+    });
+    return response.redirect("/"); 
+
 });
 
 // GET / - Render index page or redirect to landing if logged in
