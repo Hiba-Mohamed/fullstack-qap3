@@ -34,7 +34,7 @@ const USERS = [
     id: 2,
     username: "RegularUser",
     email: "user@example.com",
-    password: bcrypt.hashSync("user123", SALT_ROUNDS),
+    password: bcrypt.hashSync("gi", SALT_ROUNDS),
     role: "user", // Regular user
   },
 ];
@@ -54,9 +54,11 @@ app.post("/login", (request, response) => {
       .redirect("/login?error=All fields are required");
   }
   const user = USERS.find((user) => user.email === email);
-  if (!!user && bcrypt.compareSync(password, user.password)) {
-    request.session.email = email;
-    console.log("login successful!");
+  if (user && bcrypt.compareSync(password, user.password)) {
+    // Save the user data in the session
+    request.session.user = user;
+
+    console.log("Login successful!"); // Log user data
     return response.redirect("/");
   }
   return response.redirect("/login?error=Invalid email or password");
@@ -105,6 +107,7 @@ app.post("/signup", (request, response) => {
 
 // GET / - Render index page or redirect to landing if logged in
 app.get("/", (request, response) => {
+    console.log(request.session.user)
   if (request.session.user) {
     return response.redirect("/landing");
   }
@@ -112,7 +115,16 @@ app.get("/", (request, response) => {
 });
 
 // GET /landing - Shows a welcome page for users, shows the names of all users if an admin
-app.get("/landing", (request, response) => {});
+app.get("/landing", (request, response) => {
+    const role = request.session.user.role;
+    console.log(role);
+    const username = request.session.user.username;
+    console.log(username)
+    const errorMessage = request.query.error || null;
+    console.log("error: ",errorMessage)
+  response.render("landing", { role, username, USERS });
+
+});
 
 // Start server
 app.listen(PORT, () => {

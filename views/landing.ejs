@@ -1,0 +1,8 @@
+<%- include('partials/header', { title: "Home" }) %>
+<% if (role === "admin") { %>
+  <%- include('partials/adminDash') %>
+<% } else if (role === "user") { %>
+  <%- include('partials/userDash') %>
+<% } %>
+    <button onclick="window.location.href='/logout'">Logout</button>
+<%- include('partials/footer') %>
