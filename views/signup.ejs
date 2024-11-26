@@ -15,5 +15,10 @@
         </div>
         <button type="submit">Sign Up</button>
     </form>
+          <% if (errorMessage) { %>
+    <div style="color: rgb(157, 26, 26);">
+      <strong><%= errorMessage %></strong>
+    </div>
+  <% } %>
     <p><a href="/">Go back</a></p>
 <%- include('partials/footer') %>
