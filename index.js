@@ -34,7 +34,7 @@ const USERS = [
     id: 2,
     username: "RegularUser",
     email: "user@example.com",
-    password: bcrypt.hashSync("gi", SALT_ROUNDS),
+    password: bcrypt.hashSync("user123", SALT_ROUNDS),
     role: "user", // Regular user
   },
 ];
@@ -124,6 +124,19 @@ app.get("/landing", (request, response) => {
     console.log("error: ",errorMessage)
   response.render("landing", { role, username, USERS });
 
+});
+
+app.get("/logout", (request, response)=>{
+    response.render("logout")
+})
+
+app.post("/logout", (request, response) => {
+  request.session.destroy((error) => {
+    if (error) {
+      return response.status(500).send("Failed to log out.");
+    }
+    response.redirect("/");
+  });
 });
 
 // Start server
